@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+
+<robot>
+
+  <!-- ========================================================= -->
+  <!-- GAZEBO PHYSICS / CONTACT PROPERTIES                      -->
+  <!-- ========================================================= -->
+
+  <!-- ===================== -->
+  <!-- MAIN BODY              -->
+  <!-- ===================== -->
+
+  <gazebo reference="base_link">
+
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+
+  </gazebo>
+
+
+  <!-- ===================== -->
+  <!-- LEFT DRIVE WHEEL      -->
+  <!-- ===================== -->
+
+  <gazebo reference="left_wheel">
+
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+
+  </gazebo>
+
+
+  <!-- ===================== -->
+  <!-- RIGHT DRIVE WHEEL     -->
+  <!-- ===================== -->
+
+  <gazebo reference="right_wheel">
+
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+
+  </gazebo>
+
+
+  <!-- ===================== -->
+  <!-- CASTER SWIVEL / FORK  -->
+  <!-- ===================== -->
+
+  <gazebo reference="caster_swivel">
+
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+
+  </gazebo>
+
+
+  <!-- ===================== -->
+  <!-- CASTER WHEEL          -->
+  <!-- ===================== -->
+
+  <gazebo reference="caster_wheel">
+
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+
+  </gazebo>
+
+
+  <!-- ========================================================= -->
+  <!-- DIFFERENTIAL DRIVE SYSTEM                                 -->
+  <!-- ========================================================= -->
+
+  <gazebo>
+
+    <plugin
+      filename="gz-sim-diff-drive-system"
+      name="gz::sim::systems::DiffDrive">
+
+      <!-- ===================== -->
+      <!-- DRIVE WHEELS          -->
+      <!-- ===================== -->
+
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+
+
+      <!-- ===================== -->
+      <!-- KINEMATICS            -->
+      <!-- ===================== -->
+
+      <wheel_separation>${wheel_separation}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+
+
+      <!-- ===================== -->
+      <!-- MOTION LIMITS         -->
+      <!-- ===================== -->
+
+      <max_linear_acceleration>10</max_linear_acceleration>
+
+
+      <!-- ===================== -->
+      <!-- ROS / GAZEBO TOPICS   -->
+      <!-- ===================== -->
+
+      <topic>cmd_vel</topic>
+
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+
+
+      <!-- ===================== -->
+      <!-- ODOMETRY FRAMES       -->
+      <!-- ===================== -->
+
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+
+
+      <!-- Publish odometry at 30 Hz -->
+      <odom_publish_frequency>30</odom_publish_frequency>
+
+    </plugin>
+
+  </gazebo>
+
+
+  <!-- ========================================================= -->
+  <!-- JOINT STATE PUBLISHER                                    -->
+  <!-- ========================================================= -->
+
+  <gazebo>
+
+    <plugin
+      filename="gz-sim-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher">
+
+      <!-- Drive wheel joints -->
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+
+      <!-- Caster joints -->
+      <joint_name>caster_swivel_joint</joint_name>
+      <joint_name>caster_wheel_joint</joint_name>
+
+    </plugin>
+
+  </gazebo>
+
+
+  <!-- ========================================================= -->
+  <!-- GAZEBO SENSOR SYSTEM                                     -->
+  <!-- Required for LiDAR / other sensors                       -->
+  <!-- ========================================================= -->
+
+  <!-- <gazebo>
+
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+
+      <render_engine>ogre2</render_engine>
+
+    </plugin>
+
+  </gazebo> -->
+  <!-- ========================================================= -->
+  <!-- LIDAR SENSOR                                              -->
+  <!-- ========================================================= -->
+
+  <gazebo reference="lidar_link">
+
+    <sensor name="lidar_sensor" type="gpu_lidar">
+
+    <!--
+      LiDAR position relative to base_link.
+      Sensor is mounted on top of the robot body.
+    -->
+      <pose relative_to = 'lidar_link'>
+        0 0 0 0 0 0
+      </pose>
+      <always_on>1</always_on>
+      <update_rate>2</update_rate>
+      <visualize>1</visualize>
+      <gz_frame_id>lidar_link</gz_frame_id>
+
+      <topic>scan</topic>
+
+      <lidar>
+
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14</min_angle>
+            <max_angle>3.14</max_angle>
+          </horizontal>
+        </scan>
+
+        <range>
+          <min>0.01</min>
+          <max>12.0</max>
+          <resolution>0.005</resolution>
+        </range>
+
+        <noise>
+          <type>normal</type>
+          <mean>0.0</mean>
+          <stddev>0.001</stddev>
+        </noise>
+
+      </lidar>
+
+      
+
+    </sensor>
+
+  </gazebo>
+
+
+</robot>

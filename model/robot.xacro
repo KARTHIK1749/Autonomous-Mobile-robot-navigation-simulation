@@ -1,0 +1,562 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="mobile_robot">
+
+  <!-- ========================================================= -->
+  <!-- PARAMETERS                                                -->
+  <!-- ========================================================= -->
+
+  <!-- <xacro:property name="pi" value="3.14159265359"/> -->
+
+  <!-- Main body -->
+  <xacro:property name="body_length" value="0.60"/>
+  <xacro:property name="body_width"  value="0.40"/>
+  <xacro:property name="body_height" value="0.20"/>
+
+  <!-- Wheels -->
+  <xacro:property name="wheel_radius" value="0.10"/>
+  <xacro:property name="wheel_width"  value="0.05"/>
+  
+  <!-- LiDAR -->
+  <xacro:property name="lidar_radius" value="0.06"/>
+  <xacro:property name="lidar_height" value="0.08"/>
+
+  <!-- Distance between left/right wheel centers -->
+  <xacro:property name="wheel_separation" value="0.45"/>
+
+  <!-- Approximate masses -->
+  <xacro:property name="body_mass" value="5.0"/>
+  <xacro:property name="wheel_mass" value="0.5"/>
+  
+  <!-- include gazebo plugin -->
+  <xacro:include filename="$(find mobile_robot)/model/robot.gazebo"/>
+
+  <!-- ========================================================= -->
+  <!-- BASE LINK                                                 -->
+  <!-- ========================================================= -->
+
+  <link name="base_link">
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}"/>
+      </geometry>
+
+      <material name="body_color">
+        <color rgba="0.8 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="${body_length} ${body_width} ${body_height}"/>
+      </geometry>
+    </collision>
+
+
+    <inertial>
+      <origin xyz="0 0 0"/>
+
+      <mass value="${body_mass}"/>
+
+      <inertia
+        ixx="${(body_mass/12.0) * (body_width*body_width + body_height*body_height)}"
+        ixy="0"
+        ixz="0"
+        iyy="${(body_mass/12.0) * (body_length*body_length + body_height*body_height)}"
+        iyz="0"
+        izz="${(body_mass/12.0) * (body_length*body_length + body_width*body_width)}"/>
+    </inertial>
+
+  </link>
+
+  <!-- BASE FOOTPRINT JOINT -->
+  <joint name="base_footprint_joint" type="fixed">
+
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+
+    <!-- Footprint is at the bottom of the robot -->
+    <origin xyz="0 0 ${-body_height/2}" rpy="0 0 0"/>
+  
+  </joint>
+  <link name="base_footprint"></link>
+
+  <!-- ========================================================= -->
+  <!-- LEFT WHEEL                                                -->
+  <!-- ========================================================= -->
+
+  <link name="left_wheel">
+
+    <visual>
+
+      <!-- Cylinder's axis is normally Z.
+           Rotate it so the wheel axis becomes Y. -->
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="${wheel_radius}"
+          length="${wheel_width}"/>
+      </geometry>
+
+      <material name="wheel_color">
+        <color rgba="0.05 0.05 0.05 1.0"/>
+      </material>
+
+    </visual>
+
+
+    <collision>
+
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="${wheel_radius}"
+          length="${wheel_width}"/>
+      </geometry>
+
+    </collision>
+
+
+    <inertial>
+      <origin xyz="0 0 0"/>
+
+      <mass value="${wheel_mass}"/>
+
+      <inertia
+        ixx="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        ixy="0"
+        ixz="0"
+        iyy="${0.5 * wheel_mass * wheel_radius * wheel_radius}"
+        iyz="0"
+        izz="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+    </inertial>
+
+  </link>
+
+
+  <!-- LEFT WHEEL JOINT -->
+
+  <joint name="left_wheel_joint"
+         type="continuous">
+
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+
+    <!-- y is left/right -->
+    <origin
+      xyz="-0.10 ${wheel_separation/2} ${-body_height/2}"
+      rpy="0 0 0"/>
+
+    <!-- Wheel rotates around Y -->
+    <axis xyz="0 1 0"/>
+
+  </joint>
+
+
+  <!-- ========================================================= -->
+  <!-- RIGHT WHEEL                                               -->
+  <!-- ========================================================= -->
+
+  <link name="right_wheel">
+
+    <visual>
+
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="${wheel_radius}"
+          length="${wheel_width}"/>
+      </geometry>
+
+      <material name="wheel_color">
+        <color rgba="0.05 0.05 0.05 1.0"/>
+      </material>
+
+    </visual>
+
+
+    <collision>
+
+      <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="${wheel_radius}"
+          length="${wheel_width}"/>
+      </geometry>
+
+    </collision>
+
+
+    <inertial>
+      <origin xyz="0 0 0"/>
+
+      <mass value="${wheel_mass}"/>
+
+      <inertia
+        ixx="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"
+        ixy="0"
+        ixz="0"
+        iyy="${0.5 * wheel_mass * wheel_radius * wheel_radius}"
+        iyz="0"
+        izz="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+    </inertial>
+
+  </link>
+
+
+  <!-- RIGHT WHEEL JOINT -->
+
+  <joint name="right_wheel_joint"
+         type="continuous">
+
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+
+    <origin
+      xyz="-0.10 ${-wheel_separation/2} ${-body_height/2}"
+      rpy="0 0 0"/>
+
+    <axis xyz="0 1 0"/>
+
+  </joint>
+
+    <!-- ========================================================= -->
+  <!-- FRONT CASTER                                               -->
+  <!-- Passive swivel + free-spinning wheel                      -->
+  <!-- ========================================================= -->
+
+  <!-- ===================== -->
+  <!-- CASTER SWIVEL / FORK -->
+  <!-- ===================== -->
+
+  <link name="caster_swivel">
+
+    <!-- Swivel mounting post -->
+    <visual>
+      <origin xyz="0 0 -0.025" rpy="0 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="0.025"
+          length="0.05"/>
+      </geometry>
+
+      <material name="caster_mount_color">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+
+
+    <!-- Left fork arm -->
+    <visual>
+      <origin xyz="-0.04 0.035 -0.055" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.015 0.11"/>
+      </geometry>
+
+      <material name="caster_mount_color">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+
+
+    <!-- Right fork arm -->
+    <visual>
+      <origin xyz="-0.04 -0.035 -0.055" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.015 0.11"/>
+      </geometry>
+
+      <material name="caster_mount_color">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+
+
+    <!-- Top fork bridge -->
+    <visual>
+      <origin xyz="-0.04 0 -0.005" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.085 0.015"/>
+      </geometry>
+
+      <material name="caster_mount_color">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+
+
+    <!-- Collision: swivel post -->
+    <collision>
+      <origin xyz="0 0 -0.025" rpy="0 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="0.025"
+          length="0.05"/>
+      </geometry>
+    </collision>
+
+
+    <!-- Collision: left fork -->
+    <collision>
+      <origin xyz="-0.04 0.035 -0.055" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.015 0.11"/>
+      </geometry>
+    </collision>
+
+
+    <!-- Collision: right fork -->
+    <collision>
+      <origin xyz="-0.04 -0.035 -0.055" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.015 0.11"/>
+      </geometry>
+    </collision>
+
+
+    <!-- Collision: top bridge -->
+    <collision>
+      <origin xyz="-0.04 0 -0.005" rpy="0 0 0"/>
+
+      <geometry>
+        <box size="0.025 0.085 0.015"/>
+      </geometry>
+    </collision>
+
+
+    <inertial>
+      <origin xyz="-0.02 0 -0.04"/>
+
+      <mass value="0.05"/>
+
+      <inertia
+        ixx="0.00001"
+        ixy="0"
+        ixz="0"
+        iyy="0.00001"
+        iyz="0"
+        izz="0.00001"/>
+    </inertial>
+
+  </link>
+
+
+  <!-- ===================== -->
+  <!-- CASTER SWIVEL JOINT  -->
+  <!-- ===================== -->
+
+  <joint name="caster_swivel_joint"
+         type="continuous">
+
+    <parent link="base_link"/>
+    <child link="caster_swivel"/>
+
+    <!-- Swivel axis is ABOVE the wheel center -->
+    <origin
+      xyz="${body_length/2 - 0.08} 0 -0.08"
+      rpy="0 0 0"/>
+
+    <!-- Vertical swivel -->
+    <axis xyz="0 0 1"/>
+
+  </joint>
+
+
+  <!-- ===================== -->
+  <!-- CASTER WHEEL          -->
+  <!-- ===================== -->
+
+  <link name="caster_wheel">
+
+    <visual>
+
+      <origin
+        xyz="0 0 0"
+        rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="0.06"
+          length="0.04"/>
+      </geometry>
+
+      <material name="caster_wheel_color">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+
+    </visual>
+
+
+    <collision>
+
+      <origin
+        xyz="0 0 0"
+        rpy="${pi/2} 0 0"/>
+
+      <geometry>
+        <cylinder
+          radius="0.06"
+          length="0.04"/>
+      </geometry>
+
+    </collision>
+
+
+    <inertial>
+
+      <origin xyz="0 0 0"/>
+
+      <mass value="0.2"/>
+
+      <inertia
+        ixx="${(0.2/12.0) * (3*0.06*0.06 + 0.04*0.04)}"
+        ixy="0"
+        ixz="0"
+        iyy="${0.5 * 0.2 * 0.06 * 0.06}"
+        iyz="0"
+        izz="${(0.2/12.0) * (3*0.06*0.06 + 0.04*0.04)}"/>
+
+    </inertial>
+
+  </link>
+
+
+  <!-- ===================== -->
+  <!-- CASTER WHEEL JOINT    -->
+  <!-- ===================== -->
+
+  <joint name="caster_wheel_joint"
+         type="continuous">
+
+    <parent link="caster_swivel"/>
+    <child link="caster_wheel"/>
+
+    <!-- Wheel is below and slightly behind the swivel -->
+    <origin
+      xyz="-0.04 0 -0.06"
+      rpy="0 0 0"/>
+
+    <!-- Wheel axle -->
+    <axis xyz="0 1 0"/>
+
+  </joint>
+  <!-- ========================================================= -->
+  <!-- LIDAR                                                     -->
+  <!-- ========================================================= -->
+
+  <!-- LiDAR is rigidly mounted to the robot body -->
+  <joint name="lidar_joint" type="fixed">
+    
+
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+
+    <!-- Mount LiDAR on top of the robot -->
+    <origin xyz="0 0 ${body_height/2}" rpy="0 0 0"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+
+  </joint>
+  <gazebo reference="lidar_joint">
+    <disableFixedJointLumping>true</disableFixedJointLumping>
+    <preserveFixedJoint>true</preserveFixedJoint>
+  </gazebo>
+
+  <gazebo reference="lidar_link">
+    
+    <self_collide>false</self_collide>
+  </gazebo>
+  <!-- <link name="lidar_link">
+    <visual>
+
+       <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+
+       <geometry>
+           <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+       </geometry>
+
+       <material name="lidar_color">
+           <color rgba="0.1 0.1 0.1 1.0"/>
+       </material>
+
+    </visual>
+
+
+    <collision>
+
+      <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+      </geometry>
+
+    </collision>
+
+
+    <inertial>
+      <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+      <mass value="0.1"/>
+
+      <inertia
+        ixx="0.0001"
+        ixy="0"
+        ixz="0"
+        iyy="0.0001"
+        iyz="0"
+        izz="0.0001"/>
+    </inertial>
+
+  </link> -->
+  <link name="lidar_link">
+    <visual>
+       <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+       <geometry>
+           <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+       </geometry>
+       <material name="lidar_color">
+           <color rgba="0.1 0.1 0.1 1.0"/>
+       </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+      </geometry>
+    </collision>
+
+    <!-- CALCULATE ACCURATE CYLINDER INERTIA TENSORS -->
+    <inertial>
+      <origin xyz="0 0 ${lidar_height/2}" rpy="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia
+        ixx="${(0.1/12.0) * (3*lidar_radius*lidar_radius + lidar_height*lidar_height)}"
+        ixy="0"
+        ixz="0"
+        iyy="${(0.1/12.0) * (3*lidar_radius*lidar_radius + lidar_height*lidar_height)}"
+        iyz="0"
+        izz="${0.5 * 0.1 * lidar_radius * lidar_radius}"/>
+    </inertial>
+  </link>
+
+
+  <!--  Include the gazebo file here -->
+
+</robot>
