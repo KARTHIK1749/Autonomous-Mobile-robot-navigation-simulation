@@ -1,0 +1,44 @@
+## ros2 / colcon build artifacts
+build/
+install/
+log/
+.colcon/
+
+## Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+## Python virtual environments
+.venv/
+venv/
+env/
+
+## ros logs and recorded data
+ros_logs/
+*.bag
+*.db3
+*.mcap
+
+## Generated visualization / debugging artifacts
+frames.pdf
+frames.gv
+core
+core.*
+
+## ide and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
